@@ -1,0 +1,51 @@
+.copy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 6px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--gray-11);
+  transition:
+    background 0.12s,
+    color 0.12s;
+  text-align: start;
+  min-width: 0;
+}
+
+.copy:hover {
+  background: var(--gray-a3);
+  color: var(--gray-12);
+}
+
+.copyLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-9);
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.copyValue {
+  font-family: var(--code-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: 12px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  /* The row stays in its container and the value shortens with an ellipsis. */
+  .copy {
+    max-width: 100%;
+    min-height: 36px;
+  }
+}

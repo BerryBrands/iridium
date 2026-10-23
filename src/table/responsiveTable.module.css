@@ -1,0 +1,161 @@
+/*
+ * Phone layouts for the console tables. The data-table component uses `.stack`; a hand-built Radix table can use both classes through `tableClasses`. Desktop layout does not change.
+ *
+ * `.stack` on a `Table.Root` shows each body row as a card. A cell selects its
+ * place in the card with `data-cell`:
+ *   primary  - the title line, without a label
+ *   media    - a thumbnail at the start of the title line
+ *   select   - the row checkbox at the start of the title line
+ *   actions  - the row buttons at the end of the title line
+ *   hidden   - not shown on a phone
+ * A cell without `data-cell` shows as a label and value row. The label comes
+ * from its `data-label` attribute. The header row keeps only the sort buttons
+ * and the select-all box, so that sort and selection stay available.
+ *
+ * `.stickyFirst` is for tables that must keep their columns. The table scrolls
+ * horizontally and the first column stays in view.
+ */
+
+@media (max-width: 767px) {
+  .stack :where(table, thead, tbody) {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /*
+   * Radix gives the table a zero height and hides its overflow. That only works
+   * for a real table box, so a block table must set both back.
+   */
+  .stack table {
+    height: auto;
+    min-width: 0 !important;
+    overflow: visible;
+  }
+
+  .stack :where(thead tr) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .stack :where(thead th) {
+    display: none;
+  }
+
+  /* A header row without sort buttons or a select-all box has nothing to show. */
+  .stack :where(thead):not(:has(th[data-cell='select'], th[aria-sort], th button[aria-sort])) {
+    display: none;
+  }
+
+  .stack :where(thead th):is([aria-sort], :has(button[aria-sort])),
+  .stack :where(thead th)[data-cell='select'] {
+    display: inline-flex;
+    align-items: center;
+    width: auto !important;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--gray-a5);
+    border-radius: var(--radius-5);
+    box-shadow: none;
+  }
+
+  .stack :where(tbody) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+
+  .stack :where(tbody tr) {
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'select media primary actions'
+      'fields fields fields fields';
+    align-items: center;
+    column-gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid var(--gray-a5);
+    border-radius: var(--radius-3);
+    background: var(--color-panel-solid);
+  }
+
+  .stack :where(tbody :is(td, th)) {
+    display: flex;
+    grid-column: 1 / -1;
+    gap: var(--space-3);
+    align-items: baseline;
+    justify-content: space-between;
+    min-width: 0;
+    width: auto !important;
+    padding: var(--space-1) 0;
+    box-shadow: none;
+    overflow-wrap: anywhere;
+    text-align: end;
+  }
+
+  .stack :where(tbody :is(td, th))[data-label]::before {
+    flex-shrink: 0;
+    max-width: 45%;
+    color: var(--gray-11);
+    content: attr(data-label);
+    font-size: var(--font-size-1);
+    text-align: start;
+  }
+
+  .stack :where(tbody :is(td, th))[data-label='']::before {
+    content: none;
+  }
+
+  .stack :where(tbody :is(td, th))[data-cell='primary'] {
+    grid-area: primary;
+    justify-content: flex-start;
+    padding: 0;
+    font-weight: 500;
+    text-align: start;
+  }
+
+  .stack :where(tbody :is(td, th))[data-cell='media'] {
+    grid-area: media;
+    padding: 0;
+  }
+
+  .stack :where(tbody :is(td, th))[data-cell='select'] {
+    grid-area: select;
+    padding: 0;
+  }
+
+  .stack :where(tbody :is(td, th))[data-cell='actions'] {
+    grid-area: actions;
+    justify-content: flex-end;
+    padding: 0;
+  }
+
+  .stack :where(tbody :is(td, th))[data-cell='actions'] :where(button) {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .stack :where(tbody :is(td, th)):is([data-cell='primary'], [data-cell='media'], [data-cell='select'], [data-cell='actions'])::before {
+    content: none;
+  }
+
+  .stack :where(tbody :is(td, th))[data-cell='hidden'] {
+    display: none;
+  }
+
+  /* An empty-state row has one cell that spans every column. */
+  .stack :where(tbody tr):has(> :is(td, th):only-child) {
+    display: block;
+  }
+
+  .stickyFirst :where(th, td):first-child {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    background: var(--color-panel-solid);
+    box-shadow: inset -1px 0 0 var(--gray-a5);
+  }
+}

@@ -1,0 +1,1120 @@
+/*
+ * The console shell: a fixed header over a body row of [group rail | content | side panel slot].
+ *
+ * Every colour and size comes from the Radix Themes tokens, so the shell follows the theme and the dark mode of the
+ * host. Two custom properties adapt it to the page of the host:
+ *
+ * - `--iridium-shell-height`: the height of the shell. The default is `100%`, so an ancestor must have a height. A
+ *   host whose root has no height sets `100dvh`.
+ * - `--iridium-content-bottom-inset`: space under the content for chrome of the host that covers it.
+ */
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: var(--iridium-shell-height, 100%);
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--gray-a5);
+  background: var(--color-background);
+}
+
+.headerHome {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  text-decoration: none;
+  border-radius: var(--radius-2);
+  padding: 2px 4px;
+}
+
+.headerSearch {
+  flex: 1;
+  min-width: 0;
+  max-width: 560px;
+  margin-inline: auto;
+}
+
+.headerEnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+
+/* ── Header search ──────────────────────────────────────────────── */
+
+.search {
+  position: relative;
+}
+
+.searchShortcut {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-9);
+  padding: 1px 5px;
+  border: 1px solid var(--gray-a5);
+  border-radius: var(--radius-1);
+  user-select: none;
+}
+
+.searchResults {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 4px);
+  z-index: 30;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--gray-a5);
+  border-radius: var(--radius-3);
+  background: var(--color-panel-solid);
+  box-shadow: var(--shadow-4);
+}
+
+.searchResult {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  text-align: start;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--gray-12);
+  text-decoration: none;
+}
+
+.searchResult[data-active='true'] {
+  background: var(--accent-a3);
+}
+
+.searchResultIcon {
+  display: inline-flex;
+  justify-content: center;
+  width: 20px;
+  flex-shrink: 0;
+  color: var(--gray-10);
+}
+
+.searchResultGroup {
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+  font-size: 11px;
+  color: var(--gray-9);
+  white-space: nowrap;
+}
+
+.searchEmpty {
+  padding: 12px 10px;
+  font-size: 13px;
+  color: var(--gray-10);
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/*
+ * Collapsing closes the rail rather than thinning it, so the width itself is
+ * the animation. The element stays mounted at zero width — `visibility` is
+ * delayed to the end of the transition so it can still be seen on the way out,
+ * and removes the links from the tab order once it is closed.
+ */
+.sectionNav {
+  width: 244px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-inline-end: 1px solid var(--gray-a4);
+  background: var(--gray-a2);
+  transition:
+    width 220ms ease,
+    border-inline-end-width 220ms ease,
+    visibility 0s;
+}
+
+.sectionNav[data-collapsed] {
+  width: 0;
+  border-inline-end-width: 0;
+  visibility: hidden;
+  transition:
+    width 220ms ease,
+    border-inline-end-width 220ms ease,
+    visibility 0s 220ms;
+}
+
+/*
+ * The rail scrolls on one axis only. `overflow-y: auto` alone computes
+ * `overflow-x` to `auto` too, so a single label wider than the rail would make
+ * the whole rail scroll sideways.
+ */
+.sectionNavInner {
+  box-sizing: border-box;
+  width: 244px;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1rem 0.75rem;
+  padding-bottom: calc(1rem + var(--iridium-content-bottom-inset, 0px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sectionNav,
+  .sectionNav[data-collapsed] {
+    transition-duration: 0s;
+    transition-delay: 0s;
+  }
+}
+
+/*
+ * A rail with a footer is a column: the footer sits at the bottom of a short rail, and it stays in view at the bottom
+ * of a long one. The rows keep their height, so a long rail scrolls instead of a squeeze of its rows.
+ */
+.sectionNavInner[data-footer] {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionNavInner[data-footer] > * {
+  flex-shrink: 0;
+}
+
+/* The sticky footer covers the links that scroll under it, so it paints the rail surface: the gray tint on the page. */
+.sectionNavFooter {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-a4);
+  background: linear-gradient(var(--gray-a2), var(--gray-a2)), var(--color-background);
+}
+
+/*
+ * Where editors open, mirroring the group rail on the opposite edge — and, like
+ * the rail, the width of the column *is* the animation.
+ *
+ * The slot is the animated element rather than the panel portalled into it,
+ * because the panel is not stable: console editors are keyed on the record they
+ * edit, so clicking a second row unmounts one panel and mounts another. The
+ * column never leaves the screen, but the `<aside>` inside it is a new DOM node
+ * every time — anything animating on mount would replay there, collapsing the
+ * column and growing it back under a form that never went away.
+ *
+ * A transition on a slot that outlives its contents runs on the width actually
+ * changing, so only opening (and resizing for a wide panel) moves the column.
+ *
+ * `--side-panel-width` is the column's geometry, read by the panel's own chrome
+ * in `formShell.module.css`.
+ */
+.sidePanelSlot {
+  --side-panel-width: 380px;
+
+  width: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Wider for content a form column cannot hold, such as a tabbed detail. */
+.sidePanelSlot:has(> [data-wide]) {
+  --side-panel-width: 560px;
+}
+
+/*
+ * Open once something is portalled in. Closing has no transition of its own, so
+ * the column goes the moment the panel does rather than leaving a blank strip
+ * shrinking behind it.
+ */
+.sidePanelSlot:has(> *) {
+  width: var(--side-panel-width);
+  transition: width 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidePanelSlot:has(> *) {
+    transition-duration: 0s;
+  }
+}
+
+/*
+ * Below the breakpoint the panel takes the screen instead of a column, so the
+ * slot must not reserve any width for it.
+ */
+@media (max-width: 767px) {
+  .sidePanelSlot:has(> *) {
+    width: 0;
+  }
+}
+
+.sectionNavLabel {
+  padding: 0 12px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-9);
+  user-select: none;
+}
+
+/*
+ * The 9px start padding centres the 26px group tile on the 20px section icons below (9 + 13 = 12 + 10). With the 5px
+ * gap, the group title starts at 40px, where the section and tab labels start.
+ */
+.sectionNavHeader {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px 12px 9px;
+}
+
+.sectionNavTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-12);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * Group identity: a fixed icon on a fixed colour. Staff recognise a group by
+ * this pair long before they read the label, so the accent is applied
+ * identically wherever a group appears — the rail header and the home cards.
+ */
+.groupIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: var(--radius-2);
+  background: var(--ir-accent-tint);
+  color: var(--ir-accent-solid);
+}
+
+.navSection + .navSection {
+  margin-top: 6px;
+}
+
+/* Tabs sit under their section as secondary links — indented, quieter, and
+   smaller, so the tree reads as two levels without a connector line. */
+/* The start padding is the padding, icon and gap of `.navItem` (12 + 20 + 8), so a tab label starts where its section label starts. */
+.navSubItem {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 5px 12px 5px 40px;
+  border-radius: var(--radius-2);
+  font-size: 13px;
+  color: var(--gray-10);
+  text-decoration: none;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.navSubItem:hover {
+  background: var(--gray-a3);
+  color: var(--gray-12);
+}
+
+.navSubItem[aria-current='page'] {
+  color: var(--accent-11);
+  font-weight: 500;
+}
+
+/* `border-box`, so that the padding stays inside the full-width row. */
+.navItem {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--gray-11);
+  text-decoration: none;
+  transition:
+    background 0.12s,
+    color 0.12s;
+  text-align: start;
+}
+
+.navItem:hover {
+  background: var(--gray-a3);
+  color: var(--gray-12);
+}
+
+/* A section link is heavier than its tabs, so the tree reads as two levels. The drawer's home link keeps 500. */
+.navSection > .navItem {
+  font-weight: 600;
+}
+
+/* The router link sets aria-current, so the active rule needs no bookkeeping. */
+.navItem[aria-current='page'] {
+  background: var(--accent-a4);
+  color: var(--accent-11);
+}
+
+.navIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.navItemLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: 2rem 2.5rem;
+  padding-bottom: calc(2rem + var(--iridium-content-bottom-inset, 0px));
+  overflow-y: auto;
+  /*
+   * The scroll container must also be the containing block. Radix checkboxes,
+   * radios, switches and selects inside a <form> render a hidden native input
+   * with position: absolute; without a positioned ancestor here it anchors to
+   * the page root, escapes this pane's scrolling, and stretches the page below
+   * the console, leaving an empty strip to scroll into.
+   */
+  position: relative;
+}
+
+.sectionPanel {
+  min-width: 0;
+}
+
+.content[data-fill-content] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.content[data-fill-content] .sectionHeader {
+  flex-shrink: 0;
+}
+
+/* A view that takes the whole content pane gives its own top bar and its own padding. */
+.content[data-full-page] {
+  padding: 0;
+}
+
+.content[data-full-page] .sectionHeader[hidden] {
+  display: none;
+}
+
+.content[data-fill-content] .sectionPanel {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Focus mode ─────────────────────────────────────────────────── */
+
+/*
+ * A panel turns on the focus mode to fill the window, for example the blog
+ * editor when it is maximised. The header, the recent bar, the crumbs, the
+ * group rail and the section heading go away. The side panel slot stays,
+ * because the panel can still open an editor in it.
+ */
+.layout[data-focus] .header,
+.layout[data-focus] .recentBar,
+.layout[data-focus] .breadcrumbBar,
+.layout[data-focus] .sectionNav,
+.layout[data-focus] .drawerScrim,
+.layout[data-focus] .sectionHeader {
+  display: none;
+}
+
+/* The top edge needs less space without a heading above the panel. The phone keeps its own padding. */
+@media (min-width: 768px) {
+  .layout[data-focus] .content {
+    padding-top: var(--space-4);
+    padding-inline: var(--space-5);
+  }
+}
+
+/* ── Area switcher ──────────────────────────────────────────────── */
+
+/*
+ * The Option+Tab overlay. Centred over everything, dimmed and blurred behind,
+ * so the only thing to read while the key is held is the row of areas.
+ */
+.switcherOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 32%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.switcherPanel {
+  display: flex;
+  gap: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 16px;
+  border: 1px solid var(--gray-a5);
+  border-radius: var(--radius-5);
+  background: var(--color-panel-solid);
+  box-shadow: var(--shadow-5);
+}
+
+.switcherTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 104px;
+  flex-shrink: 0;
+  padding: 12px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-4);
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--gray-11);
+}
+
+/* Only the selected tile is lit — the switcher's whole job is to say where
+   releasing the key will land. */
+.switcherTile[data-selected] {
+  background: var(--ir-accent-tint);
+  border-color: var(--ir-accent-border);
+  color: var(--gray-12);
+}
+
+.switcherTileIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-4);
+  background: var(--ir-accent-tint);
+  color: var(--ir-accent-solid);
+}
+
+.switcherTileLabel {
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* ── Recent bar ─────────────────────────────────────────────────── */
+
+/*
+ * Where you have been, directly under the header and above the crumbs telling
+ * you where you are. Scrolls rather than wraps: it is one row by definition,
+ * and a second row would push the page down every time the trail filled up.
+ */
+.recentBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--gray-a3);
+  background: var(--gray-a2);
+}
+
+/*
+ * Only the trail scrolls. The hint after it is a legend, not part of the list,
+ * so it stays put while the chips run past — and `min-width: 0` is what lets
+ * the row shrink instead of pushing the hint off the edge.
+ */
+.recentTrail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  padding-bottom: 2px;
+  margin-bottom: -2px;
+}
+
+.recentChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 3px 10px 3px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-4);
+  font-size: 12px;
+  color: var(--gray-11);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
+}
+
+.recentChip:hover {
+  background: var(--ir-accent-tint);
+  color: var(--gray-12);
+}
+
+/* The area currently open, so the trail also says where you are standing. */
+.recentChip[data-active] {
+  background: var(--ir-accent-tint);
+  border-color: var(--ir-accent-border);
+  color: var(--gray-12);
+  font-weight: 500;
+}
+
+/* Sits at the far edge, after the trail it explains. */
+.recentHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding-inline-start: 12px;
+  font-size: 11px;
+  color: var(--gray-9);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.recentKey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--gray-a6);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-1);
+  background: var(--gray-a2);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--gray-11);
+}
+
+.recentChipIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: var(--radius-2);
+  background: var(--ir-accent-tint);
+  color: var(--ir-accent-solid);
+}
+
+/* ── Breadcrumb bar ─────────────────────────────────────────────── */
+
+/*
+ * Spans the shell under the header, above both the sidebar and the content —
+ * so the sidebar control sits at the far edge of the rail it opens and closes,
+ * and the trail starts where the content does.
+ */
+.breadcrumbBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--gray-a4);
+  background: var(--color-background);
+}
+
+.sidebarToggle {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.breadcrumbs {
+  min-width: 0;
+}
+
+/* The trail stays on one row. The last crumb gives way when the bar is narrow, so the links stay readable. */
+.breadcrumbList {
+  display: flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* The trail's end — where the viewer is, so it reads as the strongest crumb. */
+.breadcrumbItem {
+  flex-shrink: 0;
+  color: var(--gray-11);
+}
+
+.breadcrumbItem[data-last] {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.breadcrumbCurrent {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The controls of the view, for example the menu and the position of an issue, at the end of the bar. */
+.breadcrumbEnd {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+
+.breadcrumbSeparator {
+  color: var(--gray-8);
+  user-select: none;
+}
+
+.breadcrumbLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--gray-10);
+  text-decoration: none;
+}
+
+.breadcrumbLink:hover {
+  color: var(--accent-11);
+  text-decoration: underline;
+}
+
+/* ── Section header ─────────────────────────────────────────────── */
+
+.sectionHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── Home grid ──────────────────────────────────────────────────── */
+
+.home {
+  max-width: 960px;
+  margin-inline: auto;
+}
+
+.homeGroup + .homeGroup {
+  margin-top: 2rem;
+}
+
+.homeGrid {
+  display: grid;
+  /* Wide enough for a sentence of description on one or two lines — the cards
+     are read, not scanned, so a denser grid would defeat the descriptions. */
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 10px;
+}
+
+.homeCard {
+  position: relative;
+  display: flex;
+  align-items: start;
+  border: 1px solid var(--gray-a5);
+  border-radius: var(--radius-3);
+  background: var(--color-surface);
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.homeCard:hover {
+  background: var(--ir-accent-tint);
+  border-color: var(--ir-accent-border);
+}
+
+/* The whole card is the link; the star sits above it so it stays clickable. */
+.homeCardLink {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  padding-block: 14px;
+  padding-inline: 16px 44px;
+  text-decoration: none;
+  color: var(--gray-12);
+  border-radius: inherit;
+}
+
+.homeCardStar {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  cursor: pointer;
+}
+
+.homeCardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-3);
+  background: var(--ir-accent-tint);
+  color: var(--ir-accent-solid);
+}
+
+.homeCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.homeCardTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.homeCardMeta {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--gray-10);
+}
+
+/*
+ * Per-group accent. Each group owns one colour for good, so the tint and solid
+ * are resolved from Radix's scales once here and consumed by name — no colour
+ * literals in the components, and no way for the two surfaces that show a group
+ * to drift apart.
+ */
+[data-ir-accent='indigo'] {
+  --ir-accent-tint: var(--indigo-a3);
+  --ir-accent-solid: var(--indigo-11);
+  --ir-accent-border: var(--indigo-a7);
+}
+
+[data-ir-accent='cyan'] {
+  --ir-accent-tint: var(--cyan-a3);
+  --ir-accent-solid: var(--cyan-11);
+  --ir-accent-border: var(--cyan-a7);
+}
+
+[data-ir-accent='amber'] {
+  --ir-accent-tint: var(--amber-a3);
+  --ir-accent-solid: var(--amber-11);
+  --ir-accent-border: var(--amber-a7);
+}
+
+[data-ir-accent='green'] {
+  --ir-accent-tint: var(--green-a3);
+  --ir-accent-solid: var(--green-11);
+  --ir-accent-border: var(--green-a7);
+}
+
+[data-ir-accent='violet'] {
+  --ir-accent-tint: var(--violet-a3);
+  --ir-accent-solid: var(--violet-11);
+  --ir-accent-border: var(--violet-a7);
+}
+
+[data-ir-accent='blue'] {
+  --ir-accent-tint: var(--blue-a3);
+  --ir-accent-solid: var(--blue-11);
+  --ir-accent-border: var(--blue-a7);
+}
+
+[data-ir-accent='tomato'] {
+  --ir-accent-tint: var(--tomato-a3);
+  --ir-accent-solid: var(--tomato-11);
+  --ir-accent-border: var(--tomato-a7);
+}
+
+[data-ir-accent='orange'] {
+  --ir-accent-tint: var(--orange-a3);
+  --ir-accent-solid: var(--orange-11);
+  --ir-accent-border: var(--orange-a7);
+}
+
+[data-ir-accent='gray'] {
+  --ir-accent-tint: var(--gray-a3);
+  --ir-accent-solid: var(--gray-11);
+  --ir-accent-border: var(--gray-a7);
+}
+
+[data-ir-accent='plum'] {
+  --ir-accent-tint: var(--plum-a3);
+  --ir-accent-solid: var(--plum-11);
+  --ir-accent-border: var(--plum-a7);
+}
+
+/*
+ * Icons are nodes of the host. A fixed width for each place keeps the labels in line, whatever the aspect ratio of
+ * the glyph. `:where` keeps the rule weak, so a host can change it.
+ */
+.groupIcon :where(svg),
+.searchResultIcon :where(svg) {
+  width: 14px;
+}
+
+.recentChipIcon :where(svg) {
+  width: 12px;
+}
+
+.homeCardIcon :where(svg) {
+  width: 20px;
+}
+
+.switcherTileIcon :where(svg) {
+  width: 22px;
+}
+
+/* A direction icon, for example a back arrow, points the other way in a right-to-left document. */
+:global([dir='rtl']) .mirror {
+  transform: scaleX(-1);
+}
+
+/* ── Navigation drawer ──────────────────────────────────────────── */
+
+/*
+ * The drawer close button and the scrim are mobile controls. The component
+ * renders them only below the breakpoint, and these rules keep them hidden on
+ * desktop if the two ever disagree.
+ */
+.drawerClose,
+.drawerScrim {
+  display: none;
+}
+
+/* ── Mobile ─────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .header {
+    position: relative;
+    gap: 8px;
+    padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+  }
+
+  /* The menu button takes the place of the logo, with a 44px touch target. */
+  .headerMenu {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+  }
+
+  .headerSearch {
+    max-width: none;
+  }
+
+  /* 16px, so iOS does not zoom the page to reach the caret. */
+  .search .searchField {
+    font-size: 16px;
+  }
+
+  /* The results attach to the header, not to the narrow search field, so they
+     can use the full width of the screen. */
+  .search {
+    position: static;
+  }
+
+  .searchResults {
+    inset-inline: 8px;
+    max-height: 60dvh;
+  }
+
+  .searchResult {
+    min-height: 44px;
+  }
+
+  /* The avatar is the whole trigger. The name is in the menu itself. */
+  .userMenuName,
+  .userMenuChevron {
+    display: none;
+  }
+
+  .headerEnd .userMenuTrigger {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .body {
+    flex-direction: column;
+  }
+
+  /*
+   * The group navigation becomes an off-canvas drawer on the reading-start
+   * edge. It stays mounted when it is closed, so it can slide in and out.
+   * `visibility` changes at the end of the closing transition and removes the
+   * links from the tab order and the accessibility tree.
+   */
+  .sectionNav {
+    --drawer-hidden-x: -100%;
+
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 50;
+    width: min(85vw, 320px);
+    border-inline-end: 1px solid var(--gray-a5);
+    background: var(--color-panel-solid);
+    box-shadow: var(--shadow-5);
+    transform: translateX(var(--drawer-hidden-x));
+    visibility: hidden;
+    transition:
+      transform 220ms ease,
+      visibility 0s 220ms;
+  }
+
+  /* In a right-to-left document the reading-start edge is on the right. */
+  :global([dir='rtl']) .sectionNav {
+    --drawer-hidden-x: 100%;
+  }
+
+  .sectionNav[data-drawer-open] {
+    transform: none;
+    visibility: visible;
+    transition:
+      transform 220ms ease,
+      visibility 0s;
+  }
+
+  .sectionNavInner {
+    width: 100%;
+    overscroll-behavior: contain;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 12px calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .sectionNavHeader {
+    padding: 0 0 12px 9px;
+  }
+
+  .sectionNavLabel {
+    display: none;
+  }
+
+  .sectionNavHeader .drawerClose {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-inline-start: auto;
+    width: 44px;
+    height: 44px;
+  }
+
+  /* The drawer is a solid panel, so its footer is solid too. */
+  .sectionNavFooter {
+    background: var(--color-panel-solid);
+  }
+
+  .drawerScrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: rgb(0 0 0 / 40%);
+  }
+
+  /* Compact rows, so that more of a long group shows without a scroll. */
+  .navItem {
+    min-height: 36px;
+    padding-block: 6px;
+  }
+
+  .navSubItem {
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+    padding-block: 4px;
+  }
+
+  .switcherTile {
+    width: 84px;
+  }
+
+  .content {
+    padding: 1rem;
+    padding-bottom: calc(1.5rem + var(--iridium-content-bottom-inset, 0px) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content[data-fill-content] {
+    display: block;
+    overflow-y: auto;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .sectionHeaderActions {
+    margin-top: 0;
+  }
+
+  .homeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+  .sectionNav,
+  .sectionNav[data-drawer-open] {
+    transition-duration: 0s;
+    transition-delay: 0s;
+  }
+}

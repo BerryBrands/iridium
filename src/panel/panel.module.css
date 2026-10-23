@@ -1,0 +1,68 @@
+/*
+ * Edit sidebar: a real column in the console body, on the edge opposite the
+ * group navigation. It is laid out inline rather than as an overlay, so the
+ * content pane gives up the width and the table beside it stays usable.
+ *
+ * Mirrors the group rail's chrome — tinted surface, hairline border.
+ *
+ * The panel fills its slot at a fixed width and never animates itself: the
+ * opening is the slot's, so the fields do not reflow while the column opens,
+ * and swapping one panel for another leaves the column alone. `wide` widens the
+ * column by changing the slot's `--side-panel-width`; see `.sidePanelSlot` in
+ * `shell.module.css`.
+ */
+.sidePanel {
+  box-sizing: border-box;
+  width: var(--side-panel-width);
+  height: 100%;
+  overflow: hidden;
+  border-inline-start: 1px solid var(--gray-a4);
+  background: var(--gray-a2);
+}
+
+.sidePanelInner {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 1.25rem;
+  padding-bottom: calc(1.25rem + var(--iridium-content-bottom-inset, 0px));
+}
+
+/*
+ * Below the breakpoint the console body stacks, so a column would land under
+ * the table instead of beside it. The editor takes the screen instead.
+ */
+@media (max-width: 767px) {
+  .sidePanel {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    width: auto;
+    height: auto;
+    background: var(--color-background);
+    border-inline-start: none;
+  }
+
+  /* A scroll that reaches the end of the form must not move the page behind it. */
+  .sidePanelBody {
+    overscroll-behavior: contain;
+  }
+
+  .sidePanelBar {
+    flex-shrink: 0;
+    margin-bottom: 4px;
+  }
+
+  .sidePanelBar .sidePanelClose {
+    width: 44px;
+    height: 44px;
+  }
+
+  .sidePanelInner {
+    padding: 1rem;
+    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+}

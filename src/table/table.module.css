@@ -1,0 +1,65 @@
+/*
+ * Layout of the DataTable toolbar, card grid and pagination bar. The phone
+ * rules (max-width 767px) put the search on its own line and remove the
+ * first-page and last-page buttons, so that the bar fits on one line.
+ */
+
+.toolbar {
+  flex-shrink: 0;
+}
+
+.search {
+  flex: 1 1 240px;
+  max-width: 320px;
+}
+
+.toolbarEnd {
+  margin-inline-start: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+  gap: var(--space-3);
+}
+
+.card {
+  border-radius: var(--radius-3);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--focus-8);
+  outline-offset: 2px;
+}
+
+.footer {
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .search {
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+    gap: var(--space-2);
+  }
+
+  .card:active {
+    opacity: 0.8;
+  }
+
+  .pager [data-page-edge] {
+    display: none;
+  }
+
+  .pager :where(button) {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
