@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { scopedName } from './scripts/scopedName.js';
 import pkg from './package.json' with { type: 'json' };
 
 const external = [...Object.keys(pkg.peerDependencies), ...Object.keys(pkg.dependencies)];
@@ -7,8 +8,9 @@ const external = [...Object.keys(pkg.peerDependencies), ...Object.keys(pkg.depen
 export default defineConfig({
   plugins: [react()],
   css: {
-    // Stable, prefixed class names, so a host can read the DOM and override a rule without a hash in the selector.
-    modules: { generateScopedName: 'ir-[local]' },
+    // Stable, prefixed class names, so a host can read the DOM and override a rule without a hash in the selector. The
+    // module name is part of the class name, because two modules can use the same local name.
+    modules: { generateScopedName: scopedName },
   },
   build: {
     lib: {
