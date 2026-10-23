@@ -292,7 +292,7 @@ describe('the options for a host with dynamic content', () => {
     expect(screen.queryByRole('navigation', { name: 'Recent areas' })).not.toBeInTheDocument();
   });
 
-  it('links an external group out of the console, with no star and no visit record', async () => {
+  it('links an external group out of the console, lets it be a favourite, and records no visit', async () => {
     const groups: ConsoleGroup[] = [
       ...GROUPS,
       { id: 'builder', slug: 'builder', label: 'Map builder', icon: null, accent: 'blue', href: '/?builder=1', sections: [] },
@@ -303,7 +303,16 @@ describe('the options for a host with dynamic content', () => {
     const card = screen.getByRole('link', { name: /Map builder/ });
 
     expect(card).toHaveAttribute('href', '/?builder=1');
-    expect(card.parentElement?.querySelector('button')).toBeNull();
+
+    await userEvent.click(within(card.parentElement!).getByRole('button', { name: 'Add to favourites' }));
+
+    const favourites = screen.getByRole('heading', { name: 'Favourites' }).nextElementSibling as HTMLElement;
+
+    expect(within(favourites).getByRole('link', { name: /Map builder/ })).toHaveAttribute('href', '/?builder=1');
+
+    await userEvent.click(card);
+
+    expect(localStorage.getItem('console.recentGroups')).toBeNull();
 
     await userEvent.type(screen.getByRole('textbox', { name: 'Search the console' }), 'map');
 

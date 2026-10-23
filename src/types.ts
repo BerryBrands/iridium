@@ -74,8 +74,8 @@ export interface ConsoleGroup {
   landing?: ComponentType;
   /**
    * Makes the group a link out of the console, opened with a full page load: a card on the entrance page, a chip in
-   * the area bar and a search result, but never an open group. The recent list and the favourites leave it out. Give
-   * it no sections.
+   * the area bar and a search result, but never an open group. It can be a favourite, but the recent list and the
+   * switcher leave it out, because a visit to it is not a visit to the console. Give it no sections.
    */
   href?: string;
   /**

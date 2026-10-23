@@ -1,6 +1,6 @@
 {
   "name": "@berrybrands/iridium",
-  "version": "0.1.0-rc.3",
+  "version": "0.1.0-rc.4",
   "description": "A console shell and admin primitives for React and Radix Themes: an entrance grid of areas, a header with search, breadcrumbs, an Option+Tab area switcher, a two-level navigation rail, side panels and data tables.",
   "license": "MIT",
   "author": "BerryBrands",

@@ -35,7 +35,7 @@ export function ConsoleGroupCard({ group, starred = false, onToggleStar }: Conso
           {group.description != null && <span className={s.homeCardMeta}>{group.description}</span>}
         </span>
       </ConsoleLink>
-      {onToggleStar && group.href == null && (
+      {onToggleStar && (
         <IconButton
           size="1"
           variant="ghost"

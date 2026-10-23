@@ -3,6 +3,11 @@
 This project follows [Semantic Versioning](https://semver.org/). Before 1.0.0, a minor version can break the API, and
 this file names each break.
 
+## 0.1.0-rc.4
+
+- A group with `href` has a star on its entrance card and can be a favourite. The recent list and the switcher still
+  leave it out.
+
 ## 0.1.0-rc.3
 
 - **Breaking:** the class names include the module name: `ir-<module>-<local>`, for example `ir-shell-navItem` in place
