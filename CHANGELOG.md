@@ -3,6 +3,11 @@
 This project follows [Semantic Versioning](https://semver.org/). Before 1.0.0, a minor version can break the API, and
 this file names each break.
 
+## 0.1.0-rc.2
+
+- The loading spinners of `DataTable` and of a lazy page have `role="status"`.
+- The section header has the `data-console-section-header` attribute, so a host or a test can find it.
+
 ## 0.1.0-rc.1
 
 The first release candidate.

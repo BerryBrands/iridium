@@ -14,7 +14,7 @@ import s from './shell.module.css';
 function PanelFallback() {
   return (
     <Flex align="center" justify="center" style={{ minHeight: 240 }}>
-      <Spinner />
+      <Spinner role="status" />
     </Flex>
   );
 }
@@ -93,7 +93,7 @@ export function ConsoleGroupView({ group, section, fallback = <PanelFallback />,
           <Suspense fallback={fallback}>{content}</Suspense>
         ) : section ? (
           <>
-            <div className={s.sectionHeader} hidden={fullPage || undefined}>
+            <div className={s.sectionHeader} data-console-section-header hidden={fullPage || undefined}>
               <div>
                 <Heading size="5" mb={section.description ? '1' : undefined}>
                   {section.title ?? section.label}

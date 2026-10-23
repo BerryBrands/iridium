@@ -326,7 +326,7 @@ export function DataTable<T>({
   if (loading) {
     return (
       <Flex align="center" justify="center" py="9" style={{ height: '100%' }}>
-        <Spinner />
+        <Spinner role="status" />
       </Flex>
     );
   }

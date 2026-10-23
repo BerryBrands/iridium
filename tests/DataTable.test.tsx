@@ -126,6 +126,7 @@ describe('DataTable', () => {
     const { rerender } = renderThemed(<DataTable rows={[]} columns={COLUMNS} emptyLabel="None" loading />);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
 
     rerender(<DataTable rows={[]} columns={COLUMNS} emptyLabel="None" error="Failed to load" />);
 
