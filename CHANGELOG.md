@@ -3,6 +3,13 @@
 This project follows [Semantic Versioning](https://semver.org/). Before 1.0.0, a minor version can break the API, and
 this file names each break.
 
+## 0.1.0-rc.3
+
+- **Breaking:** the class names include the module name: `ir-<module>-<local>`, for example `ir-shell-navItem` in place
+  of `ir-navItem`. Two modules had a class with the same name (`search`), so the max width of the table search
+  applied to the header search.
+- `ConsoleRailLink`, `ConsoleRailSubLink` and `ConsoleNavLink` take `active`, which overrides the match on the path.
+
 ## 0.1.0-rc.2
 
 - The loading spinners of `DataTable` and of a lazy page have `role="status"`.

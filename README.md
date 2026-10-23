@@ -140,7 +140,8 @@ interface ConsoleRouter {
 
 ## Layout and CSS
 
-Every class name starts with `ir-`, and every colour comes from a Radix token, so dark mode works with no more CSS.
+Every class name has the form `ir-<module>-<name>`, for example `ir-shell-navItem`, and every colour comes from a
+Radix token, so dark mode works with no more CSS.
 The shell uses `div` elements with roles, so global styles of the host for `header` or `main` do not apply to it.
 
 | Custom property                  | Default | Use                                                               |

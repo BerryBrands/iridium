@@ -13,6 +13,24 @@ describe('isActivePath', () => {
   });
 });
 
+describe('the active override', () => {
+  it('marks a rail link active on another path, and unmarks it on its own', () => {
+    window.history.replaceState(null, '', '/console/rooms');
+    render(
+      <Theme>
+        <ConsoleProvider groups={[]}>
+          <ConsoleRailLink to="/console/rooms/ab12" icon={null} label="ab12" active />
+          <ConsoleRailLink to="/console/rooms" icon={null} label="All" active={false} />
+        </ConsoleProvider>
+      </Theme>,
+    );
+
+    expect(screen.getByRole('link', { name: 'ab12' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'All' })).not.toHaveAttribute('aria-current');
+    window.history.replaceState(null, '', '/');
+  });
+});
+
 describe('the browser router', () => {
   afterEach(() => window.history.replaceState(null, '', '/'));
 

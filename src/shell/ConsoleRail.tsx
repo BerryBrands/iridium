@@ -138,6 +138,8 @@ export interface ConsoleRailLinkProps {
   label: ReactNode;
   /** Marks the link active only on its exact path. Set it for a page without sub-pages. */
   end?: boolean;
+  /** Overrides the match on the path, for example for the default record that a group page shows. */
+  active?: boolean;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
 
@@ -147,13 +149,14 @@ export interface ConsoleRailLinkProps {
  *
  * @param props - See {@link ConsoleRailLinkProps}.
  */
-export function ConsoleRailLink({ to, icon, label, end, onClick }: ConsoleRailLinkProps) {
+export function ConsoleRailLink({ to, icon, label, end, active, onClick }: ConsoleRailLinkProps) {
   const { close } = useConsoleNavDrawer();
 
   return (
     <ConsoleNavLink
       to={to}
       end={end}
+      active={active}
       className={s.navItem}
       onClick={(event) => {
         close();
@@ -169,15 +172,17 @@ export function ConsoleRailLink({ to, icon, label, end, onClick }: ConsoleRailLi
 /**
  * A secondary link of the rail, under its page: indented, quieter and smaller, so the tree reads as two levels.
  *
- * @param props - The path, the label and an optional click handler.
+ * @param props - The path, the label, an optional `active` override and an optional click handler.
  */
 export function ConsoleRailSubLink({
   to,
   label,
+  active,
   onClick,
 }: {
   to: string;
   label: ReactNode;
+  active?: boolean;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 }) {
   const { close } = useConsoleNavDrawer();
@@ -186,6 +191,7 @@ export function ConsoleRailSubLink({
     <ConsoleNavLink
       to={to}
       end
+      active={active}
       className={s.navSubItem}
       onClick={(event) => {
         close();

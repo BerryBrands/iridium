@@ -28,6 +28,8 @@ export interface ConsoleNavLinkProps extends Omit<AnchorHTMLAttributes<HTMLAncho
   to: string;
   /** Marks the link active only on its exact path. Else a path below it also counts. */
   end?: boolean;
+  /** Overrides the match on the path, for a link that stands for a page with a different path. */
+  active?: boolean;
 }
 
 /**
@@ -36,11 +38,11 @@ export interface ConsoleNavLinkProps extends Omit<AnchorHTMLAttributes<HTMLAncho
  * @param props - See {@link ConsoleNavLinkProps}.
  */
 export const ConsoleNavLink = forwardRef<HTMLAnchorElement, ConsoleNavLinkProps>(function ConsoleNavLink(
-  { to, end = false, ...props },
+  { to, end = false, active: activeOverride, ...props },
   ref,
 ) {
   const { router } = useConsoleConfig();
-  const active = isActivePath(router.pathname, to, end);
+  const active = activeOverride ?? isActivePath(router.pathname, to, end);
 
   return <router.Link ref={ref} to={to} aria-current={active ? 'page' : undefined} {...props} />;
 });
